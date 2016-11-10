@@ -1,0 +1,283 @@
+<!DOCTYPE html PUBLIC
+
+"-//W3C//DTD XHTML 1.0 Transitional//EN"
+
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+
+<head>
+
+<meta http-equiv="Content-type" content="text/html; charset=iso-8859-1"/>
+<link rel="StyleSheet" href="styles.css" type="text/css" media="screen" />
+
+<title>Contact Details</title>
+
+<script type="text/javascript">
+/* <![CDATA[ */
+function validatememberId()
+{
+  var memberId = document.getElementById('memberId').value;
+  if (memberId.length == 0)
+  {
+  	return "Member ID\n";
+  }
+  else 
+  {
+  	return "";
+  }
+}
+
+
+function validatefName()
+{
+  var fName= document.getElementById('fName').value;
+  if (fName.length == 0)
+  {
+  	return "First Name\n";
+  }
+  else
+  {
+  	return "";
+  }
+}
+
+function validatelName()
+{
+  var lName= document.getElementById('lName').value;
+  if (lName.length == 0)
+  {
+  	return "Last Name\n";
+  }
+  else
+  {
+  	return "";
+  }
+}
+
+function validateemail()
+{
+  var email= document.getElementById('email').value;
+  if (email.length == 0)
+  {
+  	return "Email\n";
+  }
+  else
+  {
+  	return "";
+  }
+}
+
+function validatepNumber()
+{
+  var pNumber= document.getElementById('pNumber').value;
+  if (pNumber.length == 0)
+  {
+  	return "Phone Number\n";
+  }
+  else
+  {
+  	return "";
+  }
+}
+
+function validate() 
+{
+  var result = validatememberId() + validatefName() + validatelName() + validateemail() + validatepNumber();
+
+  if ( result == "" )
+  { 
+  	return true; 
+  }
+  else 
+  {
+	alert("Errors The Following Fields Were Blank:\n" + result);   // should be nothing if fields validate
+    return false;
+  }
+  
+}
+/* ]]> */
+</script>
+
+<noscript>Your browser does not support JavaScript or JavaScript is turned off!</noscript>
+
+</head>
+
+<body>
+
+<!-- Opening the form element -->
+<form name="forminfo" onsubmit="return validate();" action="http://norton.open.ac.uk/reflect.php" method="post" name="submitnewcontact">>
+
+<!-- Contact information fieldset -->
+
+<fieldset>
+
+	<legend>Personal Information</legend>
+		<br />
+		Member ID: <input name="member_id" id="memberId" type="number" tabindex="1" /><br />
+		<br />
+		First Name: <input name="first_name" id="fName" type="text" tabindex="2" /><br />
+		<br />
+		Last Name: <input name="last_name" id="lName" type="text" tabindex="3" /><br />
+		<br />
+		Email: <input name="email_address" id="email" type="text" tabindex="4" /><br />
+		<br />
+		Phone Number: <input name="phone_number" id="pNumber" type="tel" tabindex="5" /><br />
+
+
+</fieldset>
+
+<!-- Submit and reset buttons -->
+
+<p><input type="submit" name="submit" value="Submit Form" tabindex="6" />
+
+<input type="reset" name="reset" value="Clear Form" tabindex="7" /></p>
+
+<!-- Closing the form element -->
+
+</form>
+
+<!-- Create database -->
+
+<?php
+$servername = "localhost";
+$username = "root";
+$password = "root";
+
+// Create connection
+$conn = new mysqli($servername, $username, $password);
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+} 
+
+// Create database
+$sql = "CREATE DATABASE players_db";
+if ($conn->query($sql) === TRUE) {
+    echo "Database created successfully";
+} else {
+    echo "Error creating database: " . $conn->error;
+}
+
+$conn->close();
+?>
+
+<!-- Create tables -->
+
+<?php
+$servername = "localhost";
+$username = "root";
+$password = "root";
+$dbname = "players_db";
+
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+} 
+
+// sql to create table
+$sql = "CREATE TABLE players_tbl (
+memberId INT(10)  PRIMARY KEY, 
+fname VARCHAR(30),
+lname VARCHAR(30),
+email VARCHAR(50),
+phone VARCHAR(10)
+)";
+
+if ($conn->query($sql) === TRUE) {
+    echo "Players Table created successfully";
+} else {
+    echo "Error creating table: " . $conn->error;
+}
+
+//Storing the Form Information to the mysql database -->
+
+	$MemberID = $_POST["memberId"];
+    $FName = $_POST["fName"];
+	$LName = $_POST["lName"];
+    $Email = $_POST["email"];
+	$Phone = $_POST["pNumber"];
+    
+    $sql_connection = mysql_connect("localhost", "root", "root");
+ 
+    mysql_select_db("players_db", $sql_connection);
+
+    $sql = "INSERT INTO playerstable (
+                memberID,
+				fName,
+                lName,
+				email,
+				phone
+            )
+            VALUES (
+				'$MemberID',                
+				'$FName',
+                '$LName',
+                '$Email',
+                '$Phone',				
+                NOW()
+            )"
+ 
+    mysql_query($sql, $sql_connection);
+ 
+    $conn->close();
+?>
+
+<!-- Delete user with ID of 5 -->
+
+<?php
+$servername = "localhost";
+$username = "root";
+$password = "root";
+$dbname = "players_db";
+
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+} 
+
+// sql to delete a record
+$sql = "DELETE FROM players_tbl WHERE id=5";
+
+if ($conn->query($sql) === TRUE) {
+    echo "Record deleted successfully";
+} else {
+    echo "Error deleting record: " . $conn->error;
+}
+
+$conn->close();
+?>
+
+<!-- Updates Users-->
+
+<?php
+$servername = "localhost";
+$username = "root";
+$password = "root";
+$dbname = "players_db";
+
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+} 
+
+$sql = "UPDATE players_tbl SET lastname='Chicken' WHERE id=3";
+
+if ($conn->query($sql) === TRUE) {
+    echo "Record updated successfully";
+} else {
+    echo "Error updating record: " . $conn->error;
+}
+
+$conn->close();
+?>
+
+</body>
+
+</html>
